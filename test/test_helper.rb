@@ -59,6 +59,10 @@ def stub_custom_get(url, filename)
   FakeWeb.register_uri(:get, vimeo_base_url(url), :body => fixture_file(filename), :content_type => 'application/json')
 end
 
+def stub_advanced_get(url, filename)
+  FakeWeb.register_uri(:get, %r|http://vimeo.com/api/rest/v2(.*)|, :body => fixture_file(filename), :content_type => 'application/json')
+end
+
 def stub_custom_post(url, filename)
   FakeWeb.register_uri(:post, vimeo_base_url(url), :body => fixture_file(filename), :content_type => 'application/json')
 end

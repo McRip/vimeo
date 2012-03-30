@@ -95,10 +95,11 @@ module Vimeo
 private
 
       def make_request(options, authorized)
+        endpoint = Vimeo::Advanced::Base::ENDPOINT.to_s+"?"+options.to_query
         if authorized
-          raw_response = @oauth_consumer.request(:post, Vimeo::Advanced::Base::ENDPOINT, get_access_token, {}, options).body
+          raw_response = @oauth_consumer.request(:get, endpoint, get_access_token, {}).body
         else
-          raw_response = @oauth_consumer.request(:post, Vimeo::Advanced::Base::ENDPOINT, nil, {}, options).body
+          raw_response = @oauth_consumer.request(:get, endpoint, nil, {}).body
         end
 
         response = JSON.parse(raw_response)
@@ -119,6 +120,13 @@ private
             raise RequestFailed, "Error: #{status}, no error message"
           end
         end
+      end
+
+      #extracted from ActiveSupport::CoreExtensions::Hash
+      def to_query(namespace = nil)
+        collect do |key, value|
+          value.to_query(namespace ? "#{namespace}[#{key}]" : key)
+        end.sort * '&'
       end
 
     end # Base

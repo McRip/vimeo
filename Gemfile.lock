@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    vimeo (1.5.1)
+    vimeo (1.5.2)
       httparty (>= 0.4.5)
       httpclient (>= 2.1.5.2)
       json (>= 1.1.9)

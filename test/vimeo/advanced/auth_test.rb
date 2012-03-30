@@ -20,7 +20,7 @@ class AuthTest < Test::Unit::TestCase
 
     should "receive the user's credentials after checking the OAuth token" do
       stub_custom_get("/oauth/access_token", "advanced/auth/access_token.txt")
-      stub_post("", "advanced/auth/check_access_token.json")
+      stub_advanced_get("", "advanced/auth/check_access_token.json")
       auth = @auth.check_access_token
       assert_equal "token", auth["token"]
       assert_equal "write", auth["permission"]
