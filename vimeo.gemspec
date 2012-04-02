@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Matt Hooks"]
-  s.date = "2012-03-29"
+  s.date = "2012-04-02"
   s.description = "A full featured Ruby implementation of the Vimeo API."
   s.email = "matthooks@gmail.com"
   s.extra_rdoc_files = [
@@ -18,6 +18,8 @@ Gem::Specification.new do |s|
   ]
   s.files = [
     "CHANGELOG.rdoc",
+    "Gemfile",
+    "Gemfile.lock",
     "LICENSE",
     "README.markdown",
     "Rakefile",
@@ -36,10 +38,13 @@ Gem::Specification.new do |s|
     "lib/vimeo/advanced/simple_upload.rb",
     "lib/vimeo/advanced/simple_upload/chunk.rb",
     "lib/vimeo/advanced/simple_upload/task.rb",
+    "lib/vimeo/advanced/streaming_upload.rb",
+    "lib/vimeo/advanced/streaming_upload/task.rb",
     "lib/vimeo/advanced/test.rb",
     "lib/vimeo/advanced/upload.rb",
     "lib/vimeo/advanced/video.rb",
     "lib/vimeo/advanced/video_embed.rb",
+    "lib/vimeo/o_embed.rb",
     "lib/vimeo/simple.rb",
     "lib/vimeo/simple/activity.rb",
     "lib/vimeo/simple/album.rb",
@@ -48,7 +53,6 @@ Gem::Specification.new do |s|
     "lib/vimeo/simple/group.rb",
     "lib/vimeo/simple/user.rb",
     "lib/vimeo/simple/video.rb",
-    "lib/vimeo/o_embed.rb",
     "test/fixtures/advanced/album/add_to_watch_later.json",
     "test/fixtures/advanced/album/add_video.json",
     "test/fixtures/advanced/album/create.json",
@@ -140,6 +144,7 @@ Gem::Specification.new do |s|
     "test/fixtures/advanced/video/set_title.json",
     "test/fixtures/advanced/video_embed/get_presets.json",
     "test/fixtures/advanced/video_embed/set_preset.json",
+    "test/fixtures/o_embed/get_info.json",
     "test/fixtures/simple/activity/contacts_did.json",
     "test/fixtures/simple/activity/everyone_did.json",
     "test/fixtures/simple/activity/happened_to_contacts.json",
@@ -164,7 +169,6 @@ Gem::Specification.new do |s|
     "test/fixtures/simple/user/subscriptions.json",
     "test/fixtures/simple/user/videos.json",
     "test/fixtures/simple/video/info.json",
-    "test/fixtures/o_embed/get_info.json",
     "test/test_helper.rb",
     "test/vimeo/advanced/album_test.rb",
     "test/vimeo/advanced/auth_test.rb",
@@ -180,6 +184,7 @@ Gem::Specification.new do |s|
     "test/vimeo/advanced/videos_embed_test.rb",
     "test/vimeo/advanced/videos_test.rb",
     "test/vimeo/advanced_test.rb",
+    "test/vimeo/o_embed_test.rb",
     "test/vimeo/simple/activity_test.rb",
     "test/vimeo/simple/album_test.rb",
     "test/vimeo/simple/channel_test.rb",
@@ -187,7 +192,6 @@ Gem::Specification.new do |s|
     "test/vimeo/simple/user_test.rb",
     "test/vimeo/simple/video_test.rb",
     "test/vimeo/simple_test.rb",
-    "test/vimeo/o_embed_test.rb",
     "test/vimeo_test.rb",
     "vimeo.gemspec"
   ]
@@ -195,23 +199,39 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--main", "README.rdoc", "--inline-source", "--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubyforge_project = "vimeo"
-  s.rubygems_version = "1.8.10"
+  s.rubygems_version = "1.8.21"
   s.summary = "A full featured Ruby implementation of the Vimeo API."
 
   if s.respond_to? :specification_version then
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<vimeo>, [">= 0"])
       s.add_development_dependency(%q<shoulda>, [">= 2.11.3"])
       s.add_development_dependency(%q<fakeweb>, [">= 1.2.6"])
       s.add_development_dependency(%q<ruby-prof>, [">= 0.9.2"])
       s.add_development_dependency(%q<jeweler>, [">= 1.8.3"])
+      s.add_development_dependency(%q<shoulda>, [">= 2.11.3"])
+      s.add_development_dependency(%q<fakeweb>, [">= 1.2.6"])
+      s.add_development_dependency(%q<ruby-prof>, [">= 0.9.2"])
+      s.add_development_dependency(%q<shoulda>, [">= 2.11.3"])
+      s.add_development_dependency(%q<fakeweb>, [">= 1.2.6"])
+      s.add_development_dependency(%q<ruby-prof>, [">= 0.9.2"])
       s.add_runtime_dependency(%q<httparty>, [">= 0.4.5"])
       s.add_runtime_dependency(%q<json>, [">= 1.1.9"])
       s.add_runtime_dependency(%q<oauth>, [">= 0.4.3"])
       s.add_runtime_dependency(%q<httpclient>, [">= 2.1.5.2"])
       s.add_runtime_dependency(%q<multipart-post>, [">= 1.0.1"])
+      s.add_runtime_dependency(%q<mime-types>, [">= 1.17"])
     else
+      s.add_dependency(%q<vimeo>, [">= 0"])
+      s.add_dependency(%q<shoulda>, [">= 2.11.3"])
+      s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
+      s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
+      s.add_dependency(%q<jeweler>, [">= 1.8.3"])
+      s.add_dependency(%q<shoulda>, [">= 2.11.3"])
+      s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
+      s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
       s.add_dependency(%q<shoulda>, [">= 2.11.3"])
       s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
       s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
@@ -220,8 +240,17 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<oauth>, [">= 0.4.3"])
       s.add_dependency(%q<httpclient>, [">= 2.1.5.2"])
       s.add_dependency(%q<multipart-post>, [">= 1.0.1"])
+      s.add_dependency(%q<mime-types>, [">= 1.17"])
     end
   else
+    s.add_dependency(%q<vimeo>, [">= 0"])
+    s.add_dependency(%q<shoulda>, [">= 2.11.3"])
+    s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
+    s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
+    s.add_dependency(%q<jeweler>, [">= 1.8.3"])
+    s.add_dependency(%q<shoulda>, [">= 2.11.3"])
+    s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
+    s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
     s.add_dependency(%q<shoulda>, [">= 2.11.3"])
     s.add_dependency(%q<fakeweb>, [">= 1.2.6"])
     s.add_dependency(%q<ruby-prof>, [">= 0.9.2"])
@@ -230,6 +259,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<oauth>, [">= 0.4.3"])
     s.add_dependency(%q<httpclient>, [">= 2.1.5.2"])
     s.add_dependency(%q<multipart-post>, [">= 1.0.1"])
+    s.add_dependency(%q<mime-types>, [">= 1.17"])
   end
 end
 

@@ -25,6 +25,7 @@ begin
     gem.add_dependency "oauth", ">= 0.4.3"
     gem.add_dependency "httpclient", ">= 2.1.5.2"
     gem.add_dependency "multipart-post", ">= 1.0.1"
+    gem.add_dependency "mime-types", ">= 1.17"
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError

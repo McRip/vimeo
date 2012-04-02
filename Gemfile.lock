@@ -5,8 +5,10 @@ PATH
       httparty (>= 0.4.5)
       httpclient (>= 2.1.5.2)
       json (>= 1.1.9)
+      mime-types (>= 1.17)
       multipart-post (>= 1.0.1)
       oauth (>= 0.4.3)
+      vimeo
 
 GEM
   remote: http://rubygems.org/
@@ -23,7 +25,8 @@ GEM
       rake
       rdoc
     json (1.6.5)
-    multi_json (1.1.0)
+    mime-types (1.18)
+    multi_json (1.2.0)
     multi_xml (0.4.2)
     multipart-post (1.1.5)
     oauth (0.4.5)

@@ -17,7 +17,7 @@ module Vimeo
       # Returns an upload ticket.
       create_api_method :get_ticket,
                         "vimeo.videos.upload.getTicket",
-                        :optional => [:video_id]
+                        :optional => [:upload_method, :video_id]
 
       # Returns the space and HD uploads left for a user.
       create_api_method :get_quota,
@@ -28,7 +28,7 @@ module Vimeo
                         "vimeo.videos.upload.verifyChunks",
                         :required => [:ticket_id]
 
-      include Vimeo::Advanced::SimpleUpload
+      include Vimeo::Advanced::StreamingUpload
 
     end # Upload
   end # Advanced
