@@ -79,19 +79,15 @@ module Vimeo
 
           uploaded_bytes = res['range'].split("-")[1].to_i+1
 
-          i = 0
-          while (uploaded_bytes != size && i < 10) do
-            puts uploaded_bytes
-            puts size
+          puts uploaded_bytes
+          puts size
 
-            upload uploaded_bytes
-            i = i+1
-          end
+          res2 = upload uploaded_bytes if uploaded_bytes != size
 
           puts uploaded_bytes
           puts size
 
-          raise UploadError.new, "upload incomplete: #{size}, uploaded: #{uploaded_bytes}" if uploaded_bytes != size
+          raise UploadError.new, "upload incomplete: #{res.inspect}" if res2.present? && res2.code != "200"
 
           return true
         end
