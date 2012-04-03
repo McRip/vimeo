@@ -2,6 +2,7 @@ require 'rubygems'
 require 'httparty'
 require 'digest/md5'
 require 'mime/types'
+require 'logger'
 
 require 'net/http/post/multipart'
 
