@@ -49,7 +49,6 @@ module Vimeo
           uri = URI.parse @endpoint
 
           http = Net::HTTP.new(uri.host, uri.port)
-          http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
 
           req = Net::HTTP::Put.new uri.request_uri
           req.body_stream = io
