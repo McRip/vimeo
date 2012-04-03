@@ -74,7 +74,7 @@ module Vimeo
               reupload
             rescue Timeout::Error
               validate
-              return true if @uploaded_bytes == @size
+              return true if @uploaded_bytes >= @size
               raise UploadError.new, "upload incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}"
             end
           end
