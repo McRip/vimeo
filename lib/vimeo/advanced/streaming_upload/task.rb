@@ -6,6 +6,7 @@ module Vimeo
         attr_reader :io, :size, :filename
         attr_reader :endpoint
         attr_reader :id, :video_id
+        attr_reader :uploaded_bytes
 
         def initialize(vimeo, oauth_consumer, io, size, filename)
           @vimeo, @oauth_consumer = vimeo, oauth_consumer
@@ -65,6 +66,40 @@ module Vimeo
 
         # Compares Vimeo's chunk list with own chunk list. Returns +true+ if identical.
         def valid?
+
+          validate
+
+          if @uploaded_bytes != @size
+            begin
+              reupload
+            rescue Timeout::Error
+              validate
+              return true if @uploaded_bytes == @size
+              raise UploadError.new, "upload incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}"
+            end
+          end
+
+          return true
+        end
+
+        def reupload
+          uri = URI.parse @endpoint
+
+          @io.seek @uploaded_bytes
+
+          http = Net::HTTP.new(uri.host, uri.port)
+          http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
+
+          req = Net::HTTP::Put.new uri.request_uri
+          req.body_stream = @io
+          req.content_type = MIME::Types.of(filename)[0].to_s
+          req.content_length= @size
+          req['content-range'] = "bytes #{@uploaded_bytes}-#{@size}/#{@size}"
+
+          res = http.request(req)
+        end
+
+        def validate
           uri = URI.parse @endpoint
 
           http = Net::HTTP.new(uri.host, uri.port)
@@ -76,29 +111,7 @@ module Vimeo
 
           res = http.request(req)
 
-          uploaded_bytes = res['range'].split("-")[1].to_i+1
-
-          if uploaded_bytes != size
-
-            uri = URI.parse @endpoint
-
-            io.seek uploaded_bytes
-
-            http = Net::HTTP.new(uri.host, uri.port)
-            http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
-
-            req = Net::HTTP::Put.new uri.request_uri
-            req.body_stream = io
-            req.content_type = MIME::Types.of(filename)[0].to_s
-            req.content_length= size
-            req['content-range'] = "bytes #{uploaded_bytes}-#{size}/#{size}"
-
-            res = http.request(req)
-
-            raise UploadError.new, "upload incomplete: #{res.inspect}" if res.present? && res.code != "200"
-          end
-
-          return true
+          @uploaded_bytes = res['range'].split("-")[1].to_i+1
         end
 
         # Returns a hash of the sent chunks and their respective sizes.
