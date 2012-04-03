@@ -72,6 +72,13 @@ module Vimeo
           req.content_length = 0
 
           res = http.request(req)
+
+          puts uploaded_bytes = res['range'].split("-")[1].to_i+1
+          puts size
+
+          raise UploadError.new, "upload incomplete: #{size}, uploaded: #{uploaded_bytes}" if uploaded_bytes != size
+
+          true
         end
 
         # Returns a hash of the sent chunks and their respective sizes.
