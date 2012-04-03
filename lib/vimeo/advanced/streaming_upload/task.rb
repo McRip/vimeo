@@ -45,18 +45,14 @@ module Vimeo
         end
 
         # Performs the upload.
-        def upload from=nil
+        def upload
           uri = URI.parse @endpoint
-
-          io.seek from if from.present?
 
           http = Net::HTTP.new(uri.host, uri.port)
           req = Net::HTTP::Put.new uri.request_uri
           req.body_stream = io
           req.content_type = MIME::Types.of(filename)[0].to_s
           req.content_length= size
-          req['Content-Range'] = "bytes #{from}-#{size}/#{size}" if from.present?
-          req['Tranfer-Encoding'] = 'chunked'
 
           res = http.request(req)
         end
@@ -81,11 +77,25 @@ module Vimeo
 
           Rails.logger.error "size: #{size}, uploaded_bytes: #{uploaded_bytes}" if uploaded_bytes != size
 
-          res2 = upload uploaded_bytes if uploaded_bytes != size
+          uri = URI.parse @endpoint
 
-          Rails.logger.error "res: #{res2.inspect}" if res2.present? && res2.code != "200"
+          io.seek uploaded_bytes
 
-          raise UploadError.new, "upload incomplete: #{res.inspect}" if res2.present? && res2.code != "200"
+          http = Net::HTTP.new(uri.host, uri.port)
+          req = Net::HTTP::Put.new uri.request_uri
+          req.body_stream = io
+          req.content_type = MIME::Types.of(filename)[0].to_s
+          req.content_length= size
+          req['Content-Range'] = "bytes #{uploaded_bytes}-#{size}/#{size}"
+
+          Rails.logger.error "req-cr: #{req['Content-Range']}"
+          Rails.logger.error "io-pos: #{io.pos}"
+
+          res = http.request(req)
+
+          Rails.logger.error "res: #{res.inspect}" if res.present? && res.code != "200"
+
+          raise UploadError.new, "upload incomplete: #{res.inspect}" if res.present? && res.code != "200"
 
           return true
         end
