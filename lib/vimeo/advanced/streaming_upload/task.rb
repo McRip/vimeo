@@ -85,7 +85,7 @@ module Vimeo
         def reupload
           uri = URI.parse @endpoint
 
-          @io.seek @uploaded_bytes
+          @io.seek (@uploaded_bytes-1)
 
           http = Net::HTTP.new(uri.host, uri.port)
           http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
