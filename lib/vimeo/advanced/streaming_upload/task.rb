@@ -79,13 +79,11 @@ module Vimeo
 
           uploaded_bytes = res['range'].split("-")[1].to_i+1
 
-          puts uploaded_bytes
-          puts size
+          Rails.logger.error "size: #{size}, uploaded_bytes: #{uploaded_bytes}" if uploaded_bytes != size
 
           res2 = upload uploaded_bytes if uploaded_bytes != size
 
-          puts uploaded_bytes
-          puts size
+          Rails.logger.error "res: #{res2.inspect}" if res2.present? && res2.code != "200"
 
           raise UploadError.new, "upload incomplete: #{res.inspect}" if res2.present? && res2.code != "200"
 
