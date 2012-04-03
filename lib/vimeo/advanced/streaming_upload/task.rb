@@ -68,7 +68,7 @@ module Vimeo
 
           http = Net::HTTP.new(uri.host, uri.port)
           req = Net::HTTP::Put.new uri.request_uri
-          req['Content-Range'] = "bytes */*"
+          req['content-range'] = "bytes */*"
           req.content_length = 0
 
           res = http.request(req)
@@ -77,25 +77,28 @@ module Vimeo
 
           Rails.logger.error "size: #{size}, uploaded_bytes: #{uploaded_bytes}" if uploaded_bytes != size
 
-          uri = URI.parse @endpoint
+          if uploaded_bytes != size
 
-          io.seek uploaded_bytes
+            uri = URI.parse @endpoint
 
-          http = Net::HTTP.new(uri.host, uri.port)
-          req = Net::HTTP::Put.new uri.request_uri
-          req.body_stream = io
-          req.content_type = MIME::Types.of(filename)[0].to_s
-          req.content_length= size
-          req['Content-Range'] = "bytes #{uploaded_bytes}-#{size}/#{size}"
+            io.seek uploaded_bytes
 
-          Rails.logger.error "req-cr: #{req['Content-Range']}"
-          Rails.logger.error "io-pos: #{io.pos}"
+            http = Net::HTTP.new(uri.host, uri.port)
+            req = Net::HTTP::Put.new uri.request_uri
+            req.body_stream = io
+            req.content_type = MIME::Types.of(filename)[0].to_s
+            req.content_length= size
+            req['content-range'] = "bytes #{uploaded_bytes}-#{size}/#{size}"
 
-          res = http.request(req)
+            Rails.logger.error "req-cr: #{req['Content-Range']}"
+            Rails.logger.error "io-pos: #{io.pos}"
 
-          Rails.logger.error "res: #{res.inspect}" if res.present? && res.code != "200"
+            res = http.request(req)
 
-          raise UploadError.new, "upload incomplete: #{res.inspect}" if res.present? && res.code != "200"
+            Rails.logger.error "res: #{res.inspect}" if res.present? && res.code != "200"
+
+            raise UploadError.new, "upload incomplete: #{res.inspect}" if res.present? && res.code != "200"
+          end
 
           return true
         end
