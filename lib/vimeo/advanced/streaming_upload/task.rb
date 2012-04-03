@@ -45,14 +45,18 @@ module Vimeo
         end
 
         # Performs the upload.
-        def upload
+        def upload from=nil
           uri = URI.parse @endpoint
+
+          io.seek from if from.present?
 
           http = Net::HTTP.new(uri.host, uri.port)
           req = Net::HTTP::Put.new uri.request_uri
           req.body_stream = io
           req.content_type = MIME::Types.of(filename)[0].to_s
           req.content_length= size
+          req['Content-Range'] = "bytes #{from}-#{size}/#{size}" if from.present?
+          req['Tranfer-Encoding'] = 'chunked'
 
           res = http.request(req)
         end
@@ -73,12 +77,23 @@ module Vimeo
 
           res = http.request(req)
 
-          puts uploaded_bytes = res['range'].split("-")[1].to_i+1
+          uploaded_bytes = res['range'].split("-")[1].to_i+1
+
+          i = 0
+          while (uploaded_bytes != size && i < 10) do
+            puts uploaded_bytes
+            puts size
+
+            upload uploaded_bytes
+            i = i+1
+          end
+
+          puts uploaded_bytes
           puts size
 
           raise UploadError.new, "upload incomplete: #{size}, uploaded: #{uploaded_bytes}" if uploaded_bytes != size
 
-          true
+          return true
         end
 
         # Returns a hash of the sent chunks and their respective sizes.
