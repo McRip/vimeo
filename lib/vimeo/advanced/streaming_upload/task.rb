@@ -111,7 +111,7 @@ module Vimeo
 
           res = http.request(req)
 
-          @uploaded_bytes = res['range'].split("-")[1].to_i+1
+          @uploaded_bytes = res['range'].split("-")[1].to_i
         end
       end
     end
