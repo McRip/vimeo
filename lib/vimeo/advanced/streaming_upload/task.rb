@@ -74,7 +74,7 @@ module Vimeo
               reupload
             rescue Timeout::Error
               validate
-              return true if @uploaded_bytes >= @size
+              return true if @uploaded_bytes == @size
               raise UploadError.new, "upload incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}"
             end
           end
@@ -85,7 +85,7 @@ module Vimeo
         def reupload
           uri = URI.parse @endpoint
 
-          @io.seek (@uploaded_bytes-1)
+          @io.seek @uploaded_bytes
 
           http = Net::HTTP.new(uri.host, uri.port)
           http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
@@ -112,19 +112,6 @@ module Vimeo
           res = http.request(req)
 
           @uploaded_bytes = res['range'].split("-")[1].to_i+1
-        end
-
-        # Returns a hash of the sent chunks and their respective sizes.
-        def sent_chunk_sizes
-          Hash[chunks.map { |chunk| [chunk.id, chunk.size] }]
-        end
-
-        # Returns a of Vimeo's received chunks and their respective sizes.
-        def received_chunk_sizes
-          verification    = vimeo.verify_chunks(id)
-          chunk_list      = verification["ticket"]["chunks"]["chunk"]
-          chunk_list      = [chunk_list] unless chunk_list.is_a?(Array)
-          Hash[chunk_list.map { |chunk| [chunk["id"], chunk["size"].to_i] }]
         end
       end
     end
