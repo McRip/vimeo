@@ -69,6 +69,8 @@ module Vimeo
 
           validate
 
+          raise UploadError.new, "upload total incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}" if @uploaded_bytes+8 < @size
+
           if @uploaded_bytes != @size
             begin
               reupload
