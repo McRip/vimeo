@@ -16,10 +16,9 @@ module Vimeo
         # Uploads the file to Vimeo and returns the +video_id+ on success.
         def execute
           check_quota
-          authorize
-
           repeats = 0
           begin
+            authorize
             upload
             repeats = repeats+1
           end until valid? || repeats >= 15
@@ -53,6 +52,7 @@ module Vimeo
         # Performs the upload.
         def upload
           uri = URI.parse @endpoint
+          io.rewind
 
           http = Net::HTTP.new(uri.host, uri.port)
 
