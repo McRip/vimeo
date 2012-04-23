@@ -76,7 +76,7 @@ module Vimeo
 
           #raise UploadError.new, "upload total incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}" if @uploaded_bytes+8 < @size
 
-          return (@uploaded_bytes+1) != @size
+          return (@uploaded_bytes+1) == @size
           #  begin
           #    reupload
           #  rescue Timeout::Error
