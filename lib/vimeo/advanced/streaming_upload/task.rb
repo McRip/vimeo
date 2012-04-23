@@ -17,8 +17,13 @@ module Vimeo
         def execute
           check_quota
           authorize
-          upload
-          raise UploadError.new, "Validation of chunks failed." unless valid?
+
+          repeats = 0
+          begin
+            upload
+            repeats = repeats+1
+          end until valid? || repeats >= 15
+          raise UploadError.new, "Upload repeat limit reached." if repeats >= 15
           complete
 
           return video_id
@@ -69,43 +74,43 @@ module Vimeo
 
           validate
 
-          raise UploadError.new, "upload total incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}" if @uploaded_bytes+8 < @size
+          #raise UploadError.new, "upload total incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}" if @uploaded_bytes+8 < @size
 
-          if @uploaded_bytes != @size
-            begin
-              reupload
-            rescue Timeout::Error
-              validate
-              return true if @uploaded_bytes == @size
-              raise UploadError.new, "upload incomplete: size #{@size}, :uploaded: #{@uploaded_bytes}"
-            end
-          end
+          return (@uploaded_bytes+1) != @size
+          #  begin
+          #    reupload
+          #  rescue Timeout::Error
+          #    validate
+          #    return true if (@uploaded_bytes+1) == @size
+          #    raise UploadError.new, "upload incomplete: size #{@size}, :uploaded: #{@uploaded_bytes+1}"
+          #  end
+          #end
 
-          return true
+         # return true
         end
 
-        def reupload
-          uri = URI.parse @endpoint
-
-          @io.seek @uploaded_bytes
-
-          http = Net::HTTP.new(uri.host, uri.port)
-          http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
-
-          req = Net::HTTP::Put.new uri.request_uri
-          req.body_stream = @io
-          req.content_type = MIME::Types.of(filename)[0].to_s
-          req.content_length= @size
-          req['content-range'] = "bytes #{@uploaded_bytes}-#{@size}/#{@size}"
-
-          res = http.request(req)
-        end
+        #def reupload
+        #  uri = URI.parse @endpoint
+        #
+        #  @io.seek @uploaded_bytes
+        #
+        #  http = Net::HTTP.new(uri.host, uri.port)
+        #  http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
+        #
+        #  req = Net::HTTP::Put.new uri.request_uri
+        #  req.body_stream = @io
+        #  req.content_type = MIME::Types.of(filename)[0].to_s
+        #  req.content_length= @size
+        #  req['content-range'] = "bytes #{@uploaded_bytes+1}-#{@size-1}/#{@size}"
+        #
+        #  res = http.request(req)
+        #end
 
         def validate
           uri = URI.parse @endpoint
 
           http = Net::HTTP.new(uri.host, uri.port)
-          http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
+          #http.set_debug_output(Logger.new(Rails.root.join("log/vimeo_upload.log")))
 
           req = Net::HTTP::Put.new uri.request_uri
           req['content-range'] = "bytes */*"
